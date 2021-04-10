@@ -1,0 +1,140 @@
+pragma solidity ^0.8.0;
+
+
+contract antiques2{
+
+    //add events to notify the client
+
+    mapping(uint=>antiques1) antiques1;
+    uint counter;
+
+    event antiques1Status(string status, address _antiques);
+    event Registered(antiues , address);
+    
+    function registerantiues(
+        string memory _antiques_name,
+        uint _antiques_prize,
+        string memory _antiques_type
+        ) public {
+        counter++;
+        uint rating = uint(keccak256(abi.encode(_antiques1_name)))%100;
+        uint base_price = rating / 10;
+        uint max_bid_counter = ((rating-1)%10)+1;
+        antiques1 antiues = new antiques(counter, _antiques1_name, _antiques_prize, _antiques_type, rating, base_price, max_bid_counter);
+        antiques1[counter]=antiques;
+        emit antiquesRegistered(antiques, address(antiques));
+    }
+}
+
+
+contract antiques is private {
+    
+    enum antiquesState{Registered}
+
+
+    uint public antiques_id;
+    uint public _antiques_prize;
+     uint public _antiques_date;
+    string public antiques_type;
+    uint public base_price;
+   
+
+    constructor (
+        uint _antiques_id,
+        uint _antiques_prize,
+        string memory _antiques_type;
+        uint _base_price,
+        )  {
+            
+        antiques_id = _antiques_id;
+        antiques_prize = _antiques_prize;
+       antiques_type = _antiques_type;
+    
+        base_price = (_base_price*(1 ether))/100;
+       
+        state = antiuesState.Registered;
+        transferOwnership(tx.origin);
+        emit PlayerContractCreated( antiques_type,);
+        
+    }
+
+    function startantiues() public onlyOwner{
+        isActive=true;
+        state = antiuesState.onantiues;
+        emit antiquesStarted(address(this),antiques_prize);
+    }
+
+    function bid() public payable{
+        assert(isActive);
+        require(msg.sender!=owner(),"Owner cannot bid");
+        require(bidders[msg.sender]+msg.value>base_price,"Bid Value less than base price");
+        require(bidders[msg.sender]+msg.value>highestBid,"Unnecessary Bid");
+        bidders[msg.sender]+=msg.value;
+        bidderArray.push(msg.sender);
+        highestBid=bidders[msg.sender];
+        highestBidder=msg.sender;
+        bid_counter++;
+        if(bid_counter == max_bid_count) {
+            _stopAuction();
+        }
+        emit HighBidAlert(highestBid,highestBidder);
+    }
+
+    function withdrawBid() public{
+        assert(bidders[msg.sender]!=0 && highestBid!=bidders[msg.sender]);
+        uint amount = bidders[msg.sender];
+        bidders[msg.sender]=0;
+        emit bidWithdrawn(amount,msg.sender);
+        bid_counter--;
+        payable(msg.sender).transfer(amount);
+    }
+
+    function cancelantiques_bidding() public onlyOwner{
+        isActive=false;
+        state = PlayerState.Auctioned;
+        for(uint i; i<bidderArray.length; i++){
+            if(bidders[bidderArray[i]]!=0){
+                payable(bidderArray[i]).transfer(bidders[bidderArray[i]]);
+            }
+        }
+        emit antiquesCanceled(address(this),antiques_name);
+        selfdestruct(payable(owner()));
+    }
+    
+
+    
+    function _antiques() private{
+        assert(!isActive);
+        require(team_owner==highestBidder,"antiques name and prize");
+        emit auctionEnded(address(this),antiques_name);
+        emit newTeam(highestBidder);
+        selfdestruct(payable(owner()));
+    }
+    
+    function isRegistered(string memory _art) public view checkIfRegistered(_art){}
+}
+
+
+    function getBalance() view public returns(uint){
+        return payable(address(this)).balance;
+    }
+
+   
+    function getBasePrice() view public returns(uint){
+        return base_price;
+    }
+
+    function getbiddingOnantiques() view public returns(string memory _antiques1_name_name, string memory _player_type, uint _antiques_price){
+        return (antiques_name, antiques_type, base_price);
+    }
+
+   
+    function biddigmultiplier(address _multiplier) private {
+        team_multiplier = _team_multiplier;
+    }
+    
+    receive () external payable{
+        bid();
+    }
+
+}
